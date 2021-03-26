@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.util.Random;
-public class sitting_order {
+
+public class SittingOrder {
 
     public ArrayList<String> putting_in_order() {
         Random arrangement = new Random();
@@ -73,5 +74,4 @@ public class sitting_order {
         return sitting_order;
     }
 
-
-    }
+}
