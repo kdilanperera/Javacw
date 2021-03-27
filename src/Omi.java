@@ -1,6 +1,8 @@
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 public class Omi {
@@ -52,17 +54,20 @@ public class Omi {
         game.addCard(h7, h8, h9, h10, hj, hq, hk, ha, s7, s8, s9, s10, sj, sq, sk, sa, d7, d8, d9, d10, dj, dq, dk, da,c7, c8, c9, c10, cj, cq, ck, ca);
         
         // At this point all the cards are unassigned.
-        game.shuffle(game.getUnassignedCards());
+        game.shuffleCards(game.getUnassignedCards());
         // At this point cards are unassigned but shuffled.
+        System.out.println(game.unassignedCards);
         
         game.players.add(new Player("Me", Type.PLAYER));
         game.players.add(new Player("Robot1", Type.COMPUTER));
         game.players.add(new Player("Robot2", Type.COMPUTER));
         game.players.add(new Player("Robot3", Type.COMPUTER));
 
-        game.shuffle(game.getPlayers());
-        
+        game.shufflePlayers(game.getPlayers());
+        System.out.println(game.players);
 
+        Suite trump = game.separateCards();
+        System.out.println(game.players);
         
 //        for(int x=0; x<=game.getAllCards().size()-1; x++){
 //            System.out.println("Card Suit : "+game.getAllCards().get(x).getSuite()+". Card Val: "+game.getAllCards().get(x).getValue()+" The strength is: "+game.getAllCards().get(x).getStrength());
@@ -71,24 +76,40 @@ public class Omi {
 //            System.out.println();
 //        }
 //        game.choosing_for_robot();
-//        game.tactics();
+        
 //        System.out.println(sit.putting_in_order());
 
     }
     
-    public void seperateCards() {
+    public Suite separateCards() {
         int cardSet = 4;
-        int i = 0 ;
-        for (Card card : unassignedCards) {
-           for (Player player: players) {
-                if (i!=4) {
-                    player.addCard(card);
-                    i++;
-                }else {
-                    break;
-                }
+        
+        Player firstPlayer = players.get(0);
+        for (int k = 0; k < cardSet; k++) {
+            Card card = popFirstCardFromUnassignedList();
+            firstPlayer.addCard(card);
+        }
+        
+        Suite trump;
+        if (firstPlayer.getType() == Type.COMPUTER) {
+           trump = tactics(firstPlayer);
+        } else {
+            //write ur picking code here.
+            trump = Suite.HEARTS;
+        }
+        
+        for (int i = 1; i < players.size(); i++) {
+            Player player = players.get(i);
+            for (int k = 0; k < cardSet; k++) {
+                Card card = popFirstCardFromUnassignedList();
+                player.addCard(card);
             }
         }
+        return trump;
+    }
+    
+    public Card popFirstCardFromUnassignedList() {
+        return unassignedCards.remove(0);
     }
 
     
@@ -121,8 +142,8 @@ public class Omi {
     public List<Card> getUnassignedCards() {
         return unassignedCards;
     }
-    public List<Card> getPlayers() {
-        return unassignedCards;
+    public List<Player> getPlayers() {
+        return players;
     }
     public void assignCardsToPlayers() {
         int size = players.size(); // 0-3
@@ -132,7 +153,7 @@ public class Omi {
 
     }
 
-    public void shuffle(List<Card> ar) {
+    public void shuffleCards(List<Card> ar) {
         for (int j = ar.size() - 1; j > 0; j--) {
             int shuff = plswork.nextInt(j + 1);
             int shuff1 = plswork.nextInt(j + 1);
@@ -141,7 +162,17 @@ public class Omi {
             ar.set(shuff1, s);
             ar.set(shuff, e);
         }
-        System.out.println(ar);
+    }
+
+    public void shufflePlayers(List<Player> ar) {
+        for (int j = ar.size() - 1; j > 0; j--) {
+            int shuff = plswork.nextInt(j + 1);
+            int shuff1 = plswork.nextInt(j + 1);
+            Player s = ar.get(shuff);
+            Player e = ar.get(shuff1);
+            ar.set(shuff1, s);
+            ar.set(shuff, e);
+        }
     }
 
     //For Tactics
@@ -204,111 +235,41 @@ public class Omi {
 //            player4.add(getUnassignedCards().get(j));
 //        }
 //    }
+    
 
     //Rules for when the computer has to pick the trump
-//    public String tactics() {
-//        int toselect = plswork.nextInt(4);
-//        if (getCaller().get(0).getSuite() == getCaller().get(1).getSuite()) {
-//            all4 += 1;
-//            all3one += 1;
-//            a += 1;
-//
-//        }
-//
-//        if (getCaller().get(0).getSuite() == getCaller().get(2).getSuite()) {
-//            all4 += 1;
-//            all3one += 1;
-//            all3two += 1;
-//            b += 1;
-//
-//        }
-//
-//        if (getCaller().get(0).getSuite() == getCaller().get(3).getSuite()) {
-//            all4 += 1;
-//            all3two += 1;
-//            c += 1;
-//
-//        }
-//
-//        if (getCaller().get(1).getSuite() == getCaller().get(2).getSuite()) {
-//            all4 += 1;
-//            all3one += 1;
-//            all3three += 1;
-//            d += 1;
-//
-//        }
-//
-//        if (getCaller().get(1).getSuite() == getCaller().get(3).getSuite()) {
-//            all4 += 1;
-//            all3three += 1;
-//            e += 1;
-//
-//        }
-//
-//        if (getCaller().get(2).getSuite() == getCaller().get(3).getSuite()) {
-//            all4 += 1;
-//            all3two += 1;
-//            all3three += 1;
-//            f += 1;
-//
-//        }
-//        //if all 4 suits are equal
-//        if (all4 == 6) {
-//            return getCaller().get(0).getSuite();
-//        }
-//        //if 3 suits are equal
-//        else if (all3one == 3) {
-//            return getCaller().get(0).getSuite();
-//        } else if (all3two == 3) {
-//            return getCaller().get(0).getSuite();
-//        } else if (all3three == 3) {
-//            return getCaller().get(1).getSuite();
-//        }
-//        //if 2 suits are equal with the A thing
-//        else if (a == 1 && f == 1) {
-//            if (getCaller().get(0).getStrength() == 8 || getCaller().get(1).getStrength() == 8) {
-//                return getCaller().get(2).getSuite();
-//            } else if (getCaller().get(2).getStrength() == 8 || getCaller().get(3).getStrength() == 8) {
-//                return getCaller().get(0).getSuite();
-//            } else {
-//                return getCaller().get(toselect).getSuite();
-//
-//            }
-//        } else if (b == 1 && e == 1) {
-//            if (getCaller().get(0).getStrength() == 8 || getCaller().get(2).getStrength() == 8) {
-//                return getCaller().get(1).getSuite();
-//            } else if (getCaller().get(1).getStrength() == 8 || getCaller().get(3).getStrength() == 8) {
-//                return getCaller().get(0).getSuite();
-//            } else {
-//                return getCaller().get(toselect).getSuite();
-//
-//            }
-//        } else if (c == 1 && d == 1) {
-//            if (getCaller().get(0).getStrength() == 8 || getCaller().get(3).getStrength() == 8) {
-//                return getCaller().get(2).getSuite();
-//            } else if (getCaller().get(1).getStrength() == 8 || getCaller().get(2).getStrength() == 8) {
-//                return getCaller().get(0).getSuite();
-//            } else {
-//                return getCaller().get(toselect).getSuite();
-//
-//            }
-//            //if only 2 suits are equal
-//        } else if (a == 1) {
-//            return getCaller().get(0).getSuite();
-//        } else if (b == 1) {
-//            return getCaller().get(0).getSuite();
-//        } else if (c == 1) {
-//            return getCaller().get(0).getSuite();
-//        } else if (d == 1) {
-//            return getCaller().get(1).getSuite();
-//        } else if (e == 1) {
-//            return getCaller().get(1).getSuite();
-//        } else if (f == 1) {
-//            return getCaller().get(2).getSuite();
-//        } else {
-//            return getCaller().get(toselect).getSuite();
-//        }
-//    }
+    public Suite tactics(Player player) {
+        if (player.getType() == Type.PLAYER) {
+            return null;
+        }
+        //Find the thing has most suite
+        List<Card> cards = player.getCards();
+        
+        
+        Map<Suite, Integer> count = new HashMap<>();
+        count.put(Suite.DIAMOND,0);
+        count.put(Suite.CLUBS,0);
+        count.put(Suite.HEARTS,0);
+        count.put(Suite.SPADES,0);
+        
+        for (Card card : cards) {
+            Suite suite = card.getSuite();
+            Integer integer = count.get(suite);
+            integer = integer +1;
+            count.put(suite,integer);
+        }
+        
+        //Now we have to figure out the suite with most cards
+        for (Suite suite : count.keySet()) {
+            Integer integer = count.get(suite);
+        }
+        //If one sutie has 4 || 3 return it,
+        
+        // if 
+        return Suite.DIAMOND;
+    }
+}
+    
 
     //for robot 1
 //    public ArrayList<Card> getrobot1() {

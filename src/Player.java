@@ -15,4 +15,25 @@ public class Player {
     public void addCard(Card card) {
         cards.add(card);
     }
+
+    public String getName() {
+        return name;
+    }
+
+    public Type getType() {
+        return type;
+    }
+
+    public List<Card> getCards() {
+        return cards;
+    }
+
+    @Override
+    public String toString() {
+        return "Player{" +
+                "name='" + name + '\'' +
+                ", type=" + type +
+                ", cards=" + cards +
+                '}';
+    }
 }
